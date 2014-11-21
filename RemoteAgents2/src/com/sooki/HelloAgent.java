@@ -66,7 +66,7 @@ public class HelloAgent extends Agent {
 
 		public BoardState percept() {
 
-			BoardState b = environmentapi.getBoardState();
+			BoardState b = environmentapi.getBoardState(getLocalName());
 			return b;
 
 		}

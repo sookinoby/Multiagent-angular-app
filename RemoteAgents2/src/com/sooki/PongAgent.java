@@ -10,9 +10,11 @@ import java.util.Random;
 
 
 
+
 import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
 
+import com.sooki.environment.BoardState;
 import com.sooki.inter.EnvironmentApi;
 import com.sooki.utility.Helper;
 
@@ -76,6 +78,7 @@ public class PongAgent extends Agent {
 			// TODO Auto-generated method stub
 		System.out.println("hello");
 		System.out.println(environmentapi.initialise());
+		BoardState b = environmentapi.getBoardState(getLocalName());
 		block(2000);
 			
 		}

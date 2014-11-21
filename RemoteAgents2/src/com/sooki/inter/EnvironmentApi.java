@@ -4,11 +4,11 @@ package com.sooki.inter;
 
 import java.util.List;
 
-
 import com.sooki.environment.BoardState;
 import com.sooki.utility.TwoValueHolder;
 
 import retrofit.http.Body;
+import retrofit.http.EncodedPath;
 import retrofit.http.GET;
 import retrofit.http.POST;
 
@@ -21,10 +21,8 @@ public interface EnvironmentApi {
 	
 
 	@GET(ENVIRONMENT_SVC_PATH)
-	public BoardState getBoardState();
+	public BoardState getBoardState(@EncodedPath("Name") String agentName);
 
-	
-	
 	public TwoValueHolder seeCard(@Body TwoValueHolder p);
 	
 	
