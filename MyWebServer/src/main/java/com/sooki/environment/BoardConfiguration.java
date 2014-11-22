@@ -57,13 +57,17 @@ public class BoardConfiguration {
 	{
 		int x = board[a];
 		int y = board[b];
-		int arr [] = new int[2];
+		int arr [] = new int[4];
 		arr[0] = x;
 		arr[1] = y;
+		arr[2] = -100;
+		arr[3] = -100;
 		if(x==y)
 		{
 			boardState[a] = true;
 			boardState[b] = true;
+			arr[2] = -1;
+			arr[3] = -1;
 		}
 		return arr;
 	} 

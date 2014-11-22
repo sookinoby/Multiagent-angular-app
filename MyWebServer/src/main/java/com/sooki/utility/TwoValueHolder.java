@@ -1,8 +1,11 @@
 package com.sooki.utility;
 
 public class TwoValueHolder {
-	final int x;
-	final int y;
+	 int x;
+	 int y;
+	public TwoValueHolder()
+	{}
+	
 	public TwoValueHolder(int x, int y) {
 		super();
 		this.x = x;
