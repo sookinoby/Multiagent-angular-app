@@ -27,9 +27,10 @@ public interface EnvironmentApi {
 	public BoardState getBoardState(@Query("Name") String agentName);
 
 	
-	@POST("/envsee")
-	public TwoValueHolder[] seeCard(@Body TwoValueHolder p);
+	@POST("/envsee/{name}")
+	public TwoValueHolder[] seeCard(@EncodedPath("name") String agentName,@Body TwoValueHolder p);
 	
-	
+	@POST("/envdelete")
+	public void deleteCard();
 	
 }
