@@ -16,7 +16,7 @@ public class HelloAgent extends Agent {
 	
    int n = 16;
 	protected void setup() {
-		addBehaviour(new FirstActionBehaviour(this, n));
+		addBehaviour(new FirstActionBehaviour(this, n,"fred"));
 		Environment.initialise();
 		
 
