@@ -24,7 +24,7 @@ public class FirstActionBehaviour extends GeneralGameBehaviour {
 			System.out.println("agent score is" + numberScored);
 		playGame(true);
 		first = false;
-		Helper.delay(1000);
+		Helper.delay(500);
 		cur.send(msg);
 		}
 		else {

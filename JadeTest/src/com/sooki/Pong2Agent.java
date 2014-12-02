@@ -20,9 +20,9 @@ import jade.lang.acl.ACLMessage;
 
 public class Pong2Agent extends Agent {
 	
-
+	 int n = 36;
 	protected void setup() {
-		addBehaviour(new PunishBehvaiour(this,16,"bob"));
+		addBehaviour(new PunishBehvaiour(this,36,"bob"));
 	
 	}
 

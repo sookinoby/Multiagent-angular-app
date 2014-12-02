@@ -2,7 +2,7 @@ package com.sooki.environment;
 
 
 public class Environment {
-	static int n=16;
+	static int n=36;
 	static BoardConfiguration bc;
 	public static void initialise()
 	{

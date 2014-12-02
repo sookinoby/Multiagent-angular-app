@@ -17,7 +17,7 @@ import jade.lang.acl.*;
 
 public class PongAgent extends Agent {
 	int numberScored;
-	int n=16;
+	int n=36;
 	ACLMessage msg ;
 	Random generator;
 	protected void setup() {
@@ -61,7 +61,7 @@ public class PongAgent extends Agent {
 			{
 				System.out.println("----------------" + cur.getLocalName() + " is playing the round" + "----------------");
 				System.out.print(cur.getLocalName() + " "); analyzeMessage(recieved.getContent() );  
-				Helper.delay(1000);
+				Helper.delay(500);
 				System.out.println("----------------"  + cur.getLocalName() + " is done with round" + "----------------" );
 				System.out.println("");
 				send(msg);
