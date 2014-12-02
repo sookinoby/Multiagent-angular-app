@@ -1,14 +1,16 @@
 package com.sooki.utility;
 
 public class TwoValueHolder {
-	final int x;
-	final int y;
+	int x;
+	int y;
 	public TwoValueHolder(int x, int y) {
 		super();
 		this.x = x;
 		this.y = y;
 	}
 	
+	public TwoValueHolder()
+	{}
 	public int getX() {
 		return x;
 	}
@@ -33,5 +35,6 @@ public class TwoValueHolder {
 	}
 		
 }
+
 
 

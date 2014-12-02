@@ -45,14 +45,14 @@ public class Pong2Agent extends Agent {
 		//Environment.initialise();
 		
 		msg = new ACLMessage(ACLMessage.INFORM);
-		r = new AID("test",AID.ISLOCALNAME);
+		r = new AID("bob",AID.ISLOCALNAME);
 		msg.addReceiver(r);
 		
 	//	memory = new Memory();
 		primary = new LimitedMemory();
 		secondary = new LimitedMemory();
 		generator = new Random();
-		generator.setSeed(0);
+	//	generator.setSeed(0);
 	}
 
 	class myBehaviour extends SimpleBehaviour {
@@ -129,14 +129,17 @@ public class Pong2Agent extends Agent {
 		
 		public boolean makeMove(int a, int b,boolean faking) {
 			TwoValueHolder toRev = new TwoValueHolder(a,b);
-			TwoValueHolder  Revelead = environmentapi.seeCard(toRev);
-			int re[] = new int [2];
-			re[0] = Revelead.getX();
-			re[1] = Revelead.getY();
+			TwoValueHolder  Revelead[] = environmentapi.seeCard(cur.getLocalName(),toRev);
+			int re[] = new int [4];
+			re[0] = Revelead[0].getX();
+			re[1] = Revelead[0].getY();
+			re[2] = Revelead[1].getX();
+			re[3] = Revelead[1].getY();
 			if (re[0] == re[1]) {
 				primary.remove(a, re[0]);
 				primary.remove(b, re[1]);
-				numberScored++;
+				if(re[2] ==-1 && re[3]==-1)
+					numberScored++;
 				numberOfMovesMade++;
 				msg.setContent(constructTruthMessage(a, re[0],b, re[0]));
 				return true;
@@ -186,6 +189,19 @@ public class Pong2Agent extends Agent {
 		//	int memArray [] = memory.getMemory();
 			int moves[] = new int [2];
 			moves = primary.matchingEntrySameMemory();
+			if(moves[0] != -1 && moves[1] != -1 && possible.contains(moves[0]) && possible.contains(moves[1]) )
+			return moves;
+			
+			if(moves[0] != -1 && moves[1] != -1 && !possible.contains(moves[0]) )
+			{
+				primary.remove(moves[0], -1);
+			}
+			if(moves[0] != -1 && moves[1] != -1 && !possible.contains(moves[0]) )
+			{
+				primary.remove(moves[1],-1);
+			}
+			moves[0] = -1;
+			moves[1] = -1;
 			return moves;
 			
 		}
@@ -195,8 +211,21 @@ public class Pong2Agent extends Agent {
 		//	int memArray [] = memory.getMemory();
 			int moves[] = new int [2];
 			moves = primary.matchingEntryMixed(secondary);
-			return moves;
-			
+			if(moves[0] != -1 && moves[1] != -1 && possible.contains(moves[0]) && possible.contains(moves[1]) )
+				return moves;
+				
+				if(moves[0] != -1 && moves[1] != -1 && !possible.contains(moves[0]) )
+				{
+					primary.remove(moves[0], -1);
+					secondary.remove(moves[0], -1);
+				}
+				if(moves[0] != -1 && moves[1] != -1 && !possible.contains(moves[0]) )
+				{
+					primary.remove(moves[0], -1);
+				}
+				moves[0] = -1;
+				moves[1] = -1;
+				return moves;
 		}
 		
 		public void printPossible(ArrayList<Integer>  possible ) {
@@ -286,7 +315,7 @@ public class Pong2Agent extends Agent {
 				if(faking)
 					currentLie++;
 				playGame(faking);
-				Helper.delay(1000);
+				Helper.delay(6000);
 				send(msg);
 				
 			}

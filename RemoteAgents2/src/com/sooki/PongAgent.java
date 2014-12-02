@@ -11,12 +11,14 @@ import java.util.Random;
 
 
 
+
 import retrofit.RestAdapter;
 import retrofit.RestAdapter.LogLevel;
 
 import com.sooki.environment.BoardState;
 import com.sooki.inter.EnvironmentApi;
 import com.sooki.utility.Helper;
+import com.sooki.utility.TwoValueHolder;
 
 import jade.core.AID;
 import jade.core.Agent;
@@ -24,7 +26,7 @@ import jade.core.behaviours.*;
 import jade.lang.acl.*;
 
 public class PongAgent extends Agent {
-	private final String TEST_URL = "http://localhost:8080";
+	private final String API_URL = "http://localhost:8080";
 	int numberScored;
 	int n=16;
 	ACLMessage msg ;
@@ -34,7 +36,7 @@ public class PongAgent extends Agent {
 		addBehaviour(new myBehaviour(this));
 		try {
 		 environmentapi = new RestAdapter.Builder()
-		.setEndpoint(TEST_URL)
+		.setEndpoint(API_URL)
 		.setLogLevel(LogLevel.FULL)
 		.build()
 		.create(EnvironmentApi.class);
@@ -76,9 +78,18 @@ public class PongAgent extends Agent {
 		@Override
 		public void action() {
 			// TODO Auto-generated method stub
-		System.out.println("hello");
+		System.out.println("hello 21456666");
 		System.out.println(environmentapi.initialise());
 		BoardState b = environmentapi.getBoardState(getLocalName());
+		TwoValueHolder toRev = new TwoValueHolder(0,1);
+	
+		TwoValueHolder  Revelead[] = environmentapi.seeCard(cur.getLocalName(),toRev);
+		int re[] = new int [4];
+		re[0] = Revelead[0].getX();
+		re[1] = Revelead[0].getY();
+		re[2] = Revelead[1].getX();
+		re[3] = Revelead[1].getY();
+	
 		block(2000);
 			
 		}

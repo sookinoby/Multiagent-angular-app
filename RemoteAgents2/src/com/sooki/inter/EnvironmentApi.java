@@ -11,6 +11,7 @@ import retrofit.http.Body;
 import retrofit.http.EncodedPath;
 import retrofit.http.GET;
 import retrofit.http.POST;
+import retrofit.http.Query;
 
 
 public interface EnvironmentApi {
@@ -21,9 +22,11 @@ public interface EnvironmentApi {
 	
 
 	@GET(ENVIRONMENT_SVC_PATH)
-	public BoardState getBoardState(@EncodedPath("Name") String agentName);
+	public BoardState getBoardState(@Query("Name") String agentName);
 
-	public TwoValueHolder seeCard(@Body TwoValueHolder p);
+
+	@POST("/envsee/{name}")
+	public TwoValueHolder[] seeCard(@EncodedPath("name") String agentName,@Body TwoValueHolder p);
 	
 	
 	
