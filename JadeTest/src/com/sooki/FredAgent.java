@@ -17,7 +17,7 @@ import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 
-public class Pong2Agent extends Agent {
+public class FredAgent extends Agent {
 	
 	int numberScored = 0;
 	int n=16;

@@ -17,7 +17,7 @@ import jade.core.Agent;
 import jade.core.behaviours.*;
 import jade.lang.acl.ACLMessage;
 
-public class HelloAgent extends Agent {
+public class BobAgent extends Agent {
 	boolean first = true;
 	int numberScored = 0;
 	int n=16;
