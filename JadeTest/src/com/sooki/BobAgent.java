@@ -20,27 +20,38 @@ import jade.lang.acl.ACLMessage;
 public class BobAgent extends Agent {
 	boolean first = true;
 	int numberScored = 0;
-	int n=16;
+	int n=36;
 	//Memory memory;
 	Random generator;
 	LimitedMemory primary;
-	LimitedMemory secondary;
-	ACLMessage msg ;
-	AID r;
+	LimitedMemory secondary_Fred,secondary_Jeff;
+	ACLMessage msg_turn_message,msg_for_Jeff,msg_for_Fred ;
+	AID r,rFred,rJeff;
 	int numberOfMovesMade = 0 ;
 	int maxLieCount = 2;
-	int currentLie = 0;
+	int currentLie_Fred = 0;
+	int currentLie_Jeff = 0;
+	ArrayList<String> otherAgents;
+	boolean faking_Fred = false, faking_Jeff =false;
 	protected void setup() {
 		addBehaviour(new myBehaviour(this));
 		Environment.initialise();
 		
-		msg = new ACLMessage(ACLMessage.INFORM);
-		r = new AID("bob",AID.ISLOCALNAME);
-		msg.addReceiver(r);
+		msg_turn_message = new ACLMessage(ACLMessage.INFORM);
+		msg_for_Jeff = new ACLMessage(ACLMessage.INFORM);
+		msg_for_Fred = new ACLMessage(ACLMessage.INFORM);
+		r = new AID("Fred",AID.ISLOCALNAME);
+		rFred = new AID("Fred",AID.ISLOCALNAME);
+		rJeff = new AID("Jeff",AID.ISLOCALNAME);
+		msg_turn_message.addReceiver(r);
+		otherAgents = new ArrayList<>();
+		msg_for_Jeff.addReceiver(rJeff);
+		msg_for_Fred.addReceiver(rFred);
 		
 	//	memory = new Memory();
 		primary = new LimitedMemory();
-		secondary = new LimitedMemory();
+		secondary_Fred = new LimitedMemory();
+		secondary_Jeff = new LimitedMemory();
 		generator = new Random();
 		generator.setSeed(0);
 	}
@@ -87,7 +98,40 @@ public class BobAgent extends Agent {
 			
 		}
 		
-		public boolean analyzeMessage(String content)
+		public boolean analyzeMessageofFred(String content)
+		{ 
+			boolean isfaking = false;
+			try {
+			//System.out.println("the content is"  + content);
+			
+			String posval [] = content.split(";");
+			String me1[] = posval[0].split("=");
+			String me2[] =  posval[1].split("=");
+			
+			int pos1 = Integer.parseInt(me1[0]);
+			int pos2 = Integer.parseInt(me2[0]);
+			int mem1 = Integer.parseInt(me1[1]);
+			int mem2 = Integer.parseInt(me1[1]);
+			
+			secondary_Fred.add(pos1, mem1);
+			secondary_Fred.add(pos2, mem2);
+			isfaking = primary.isFaking(secondary_Fred);
+			if(isfaking)
+			{
+				primary.removeBadMemory(secondary_Fred);
+				//System.out.println( getLocalName() + " Says: Other agent lied to me");
+			}
+		}
+		catch (Exception e)
+		{
+			System.out.println("Recieved invalid message");
+		}
+			return isfaking;
+		}
+		
+		
+		// Jeff is secondary2;
+		public boolean analyzeMessageofJeff(String content)
 		{ 
 			boolean isfaking = false;
 			try {
@@ -102,12 +146,12 @@ public class BobAgent extends Agent {
 			int mem1 = Integer.parseInt(me1[1]);
 			int mem2 = Integer.parseInt(me1[1]);
 			
-			secondary.add(pos1, mem1);
-			secondary.add(pos2, mem2);
-			isfaking = primary.isFaking(secondary);
+			secondary_Jeff.add(pos1, mem1);
+			secondary_Jeff.add(pos2, mem2);
+			isfaking = primary.isFaking(secondary_Jeff);
 			if(isfaking)
 			{
-				primary.removeBadMemory(secondary);
+				primary.removeBadMemory(secondary_Jeff);
 				System.out.println( getLocalName() + " Says: Other agent lied to me");
 			}
 		}
@@ -118,15 +162,17 @@ public class BobAgent extends Agent {
 			return isfaking;
 		}
 		
-		
-		public boolean makeMove(int a, int b) {
+		public boolean makeMove(int a, int b,boolean faking_Fred,boolean faking_Jeff) {
 			int re[] = Environment.seeCard(a, b);
+			msg_turn_message.setContent("goAhead");;
 			if (re[0] == re[1]) {
 				primary.remove(a, re[0]);
 				primary.remove(b, re[1]);
 				numberScored++;
 				numberOfMovesMade++;
-				msg.setContent(constructTruthMessage(a, re[0],b, re[0]));
+				msg_turn_message.setContent("goAhead");;
+				msg_for_Jeff.setContent(constructTruthMessage(a, re[0],b, re[0]));
+				msg_for_Fred.setContent(constructTruthMessage(a, re[0],b, re[0]));
 				return true;
 			} else {
 				System.out.println("");
@@ -138,10 +184,16 @@ public class BobAgent extends Agent {
 				numberOfMovesMade++;
 				if(prob > 0.5)
 				{
-					msg.setContent(constructTruthMessage(a, re[0],b, re[0]));
+					msg_turn_message.setContent("goAhead");;
+					msg_for_Jeff.setContent(constructTruthMessage(a, re[0],b, re[0]));
+					msg_for_Fred.setContent(constructTruthMessage(a, re[0],b, re[0]));
+					
 				}
 				else {
-					msg.setContent(construtFalseMessage(a, re[0],b, re[0]));
+					msg_turn_message.setContent("goAhead");;
+					msg_for_Jeff.setContent(construtFalseMessage(a, re[0],b, re[0]));
+					msg_for_Fred.setContent(construtFalseMessage(a, re[0],b, re[0]));
+					
 				}
 				
 				return false;
@@ -178,11 +230,20 @@ public class BobAgent extends Agent {
 			
 		}
 		
-		public int [] possibleSucessMovesAvailable(ArrayList<Integer>  possible)
+		public int [] possibleSucessMovesAvailableFromFred(ArrayList<Integer>  possible)
 		{
 		//	int memArray [] = memory.getMemory();
 			int moves[] = new int [2];
-			moves = primary.matchingEntryMixed(secondary);
+			moves = primary.matchingEntryMixed(secondary_Fred);
+			return moves;
+			
+		}
+		
+		public int [] possibleSucessMovesAvailableFromJeff(ArrayList<Integer>  possible)
+		{
+		//	int memArray [] = memory.getMemory();
+			int moves[] = new int [2];
+			moves = primary.matchingEntryMixed(secondary_Jeff);
 			return moves;
 			
 		}
@@ -192,6 +253,7 @@ public class BobAgent extends Agent {
 			{
 				System.out.print(q + " ");
 			}
+		
 		}
 		public int [] generateRandom(ArrayList<Integer>  possible)
 		{
@@ -214,11 +276,12 @@ public class BobAgent extends Agent {
 			
 		}
 		
-		public void playGame(boolean faking)
+		public void playGame(boolean faking_Fred,boolean faking_Jeff)
 		{
 			System.out.println("----------------" + cur.getLocalName() + " is playing the round" + "----------------");
 		
-				boolean secondaryMemoryUsed = false;
+				boolean secondaryMemoryUsedFred = false;
+				boolean secondaryMemoryUsedJeff = false;
 				BoardState  b = percept();
 				ArrayList<Integer>  possible =  possibleMoves(b);
 				b.printBoardState();
@@ -226,36 +289,68 @@ public class BobAgent extends Agent {
 				int moves[] = successMovesAvailable(possible);
 				if(moves[0] == -1 || moves[1] == -1)
 				{
-					if(faking == false && maxLieCount > currentLie  )
+					if(currentLie_Fred < currentLie_Jeff)
 					{
-						moves = possibleSucessMovesAvailable(possible);
-						secondaryMemoryUsed = true;
+					if(faking_Fred == false && maxLieCount > currentLie_Fred  )
+					{
+						moves = possibleSucessMovesAvailableFromFred(possible);
+						secondaryMemoryUsedFred = true;
 						
 					}
-					if(moves[0] == -1 || moves[1] == -1)
+					else if(faking_Jeff == false && maxLieCount > currentLie_Jeff  )
 					{
-						moves = generateRandom(possible);
-						secondaryMemoryUsed = false;
+						moves = possibleSucessMovesAvailableFromJeff(possible);
+						secondaryMemoryUsedJeff = true;
+						
 					}
+			
+					}
+					else {
+						if(faking_Jeff == false && maxLieCount > currentLie_Jeff  )
+						{
+							moves = possibleSucessMovesAvailableFromJeff(possible);
+							secondaryMemoryUsedJeff = true;
+							
+						}
+						else if(faking_Fred == false && maxLieCount > currentLie_Fred  )
+						{
+							moves = possibleSucessMovesAvailableFromFred(possible);
+							secondaryMemoryUsedFred = true;	
+						}
+					}
+					
+				
 					
 					
 				//	System.out.println("No success move was found");
 				}	
-				
+				if(moves[0] == -1 || moves[1] == -1 || !possible.contains(moves[0]) || !possible.contains(moves[1]))
+				{
+					System.out.println("playing random moves");
+					moves = generateRandom(possible);
+					secondaryMemoryUsedFred = false;
+					secondaryMemoryUsedJeff = false;
+				}
 				if(moves[0] == -1 || moves[1] == -1)
 				{
 					System.out.println("game ended no possible moves");
 				}	
 				else {
 					System.out.println("The move made " + moves[0] + " "+ moves[1]);
-					boolean success = makeMove(moves[0] ,moves[1]);
-					if(success == false && faking == false && secondaryMemoryUsed == true)
+					boolean success = makeMove(moves[0] ,moves[1],faking_Fred,faking_Jeff);
+					if(success == false && faking_Fred == false && secondaryMemoryUsedFred == true)
 					{
-						currentLie++;
-						secondary.remove(moves[0],moves[1]);
+						currentLie_Fred++;
+						secondary_Fred.remove(moves[0],moves[1]);
+					}
+					else if(success == false && faking_Fred == false && secondaryMemoryUsedJeff == true)
+					{
+						currentLie_Jeff++;
+						secondary_Jeff.remove(moves[0],moves[1]);
 					}
 				//	System.out.println(memory);
 				}
+				
 				System.out.println("The score " + numberScored);
 				System.out.println("The number of moves made " + numberOfMovesMade);
 				System.out.println("----------------"  + cur.getLocalName() + " is done with round" + "----------------" );
@@ -265,32 +360,56 @@ public class BobAgent extends Agent {
 		}
 
 		public void action() {
-
+			
 			if(first)	
 			{
-			playGame(true);
+			playGame(true,true);
 			first = false;
 			Helper.delay(1000);
-			send(msg);
+			send(msg_for_Fred);
+			send(msg_for_Jeff);
+			send(msg_turn_message);
+			
 			}
 			else {
 			ACLMessage recieved = blockingReceive();
 			if(recieved != null)
 			{
-				boolean faking = analyzeMessage(recieved.getContent());
-				if(faking)
-					currentLie++;
-				playGame(faking);
+				
+				if(recieved.getSender().getLocalName().equals("Fred") & !recieved.getContent().equals("goAhead"))
+				{
+				faking_Fred = analyzeMessageofFred(recieved.getContent());
+				if(faking_Fred)
+					currentLie_Fred++;
+				}
+				if(recieved.getSender().getLocalName().equals("Jeff") & !recieved.getContent().equals("goAhead"))
+				{
+					faking_Jeff = analyzeMessageofJeff(recieved.getContent());
+					if(faking_Jeff)
+						currentLie_Jeff++;
+				}
+				if(recieved.getContent().equals("goAhead"))
+				{
+				playGame(faking_Fred,faking_Jeff);
+				faking_Fred = false;
+				faking_Jeff = false;
 				Helper.delay(1000);
-				send(msg);
+				send(msg_for_Fred);
+				send(msg_for_Jeff);
+				send(msg_turn_message);
+				}
+				
 				
 			}
 			}
+			}
+
+
 			
-		}
-
+		
+	
 		private boolean finished = false;
-
+		@Override
 		public boolean done() {
 			return finished;
 		}

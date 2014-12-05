@@ -6,7 +6,7 @@ import java.util.concurrent.LinkedBlockingDeque;
 public class LimitedMemory {
 
 	LinkedBlockingDeque<Cell> mem;
-	int memLimit = 16;
+	int memLimit = 4;
 	public LimitedMemory()
 	{
 		mem = new LinkedBlockingDeque<Cell>();
